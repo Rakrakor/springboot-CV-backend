@@ -1,0 +1,115 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+	<title>Samuel.Rakoton</title>
+
+	<meta charset="UTF-8">
+	<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+
+	<link rel = "stylesheet" type = "text/css" href = "/style.css" /> 
+
+</head>
+
+
+
+<body>
+
+
+<!-- Top Section -->
+
+		<div class="topleft"></div>
+		<!-- Top Section Left  Empty-->
+		<div class="topright">
+		<!-- Top Section Right  MENU-->
+				<ul>
+					<li ><a href="index">Home</a></li>
+					<li ><a href="skills">Skills</a></li>
+					<li ><a href="contact">Contact</a></li>
+					
+				</ul>
+		</div>
+<!-- Middle Section -->
+
+	    <div  class="Middle">
+
+		
+		<div align="center" class="jumbotron">
+		<h1>SKILLS</h1>
+	       
+	       <table class="table" border="1" cellpadding="10">
+	       
+	       		<thead>
+	       			<tr>
+	       				<th>Title</th>
+	       				<th>Duration</th>
+	       				<th>Expertise</th>
+	       				<th>Description</th>
+	       			</tr>
+	       			
+	       		</thead>
+	       		<tbody>
+	       			<tr th:each="skillsList:${skillsList}">
+	       				<td th:text="${skillsList.title}">titre</td>
+	       				<td th:text="${skillsList.duration}">Length of Use</td>
+	       				<td th:text="${skillsList.expertiseLevel}">Expertise Level</td>
+	       				<td>
+	       					
+	       					<button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#{${skillsList.id}}">Description</button>
+							<div id="${skillsList.id}" class="collapse">
+								<p th:text="${skillsList.description}"></p>
+							</div>
+	       				</td>
+	       				
+	       			</tr>
+	       		</tbody>
+ 
+	       </table>
+
+	    </div>
+	    </div>
+	   
+	   
+	
+
+<!-- Bottom Section -->
+
+<div class="Bottom">
+
+	<div class="Bottom-Top">
+			<a href="#Download Resume">Download Resume</a>
+	</div>
+
+
+	<div class="Bottom-Bottom">
+	<a id="Download" href="http://www.linkedin.com/in/samuel-rakoton29" target="_blank" >Linked <i class="fab fa-linkedin-in"></i>
+				</a>
+	</div>
+
+
+</div>
+
+</body>
+
+</html>
+
