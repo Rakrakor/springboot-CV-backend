@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.samrak.CV.entities.Offer;
+import com.samrak.CV.entities.Users;
 import com.samrak.CV.repository.OfferRepository;
 
 @Service
@@ -20,8 +21,8 @@ public class ServiceOffer {
 		return offerRepo.findAll();
 	}
 	
-	public List<Offer> listUserOffers(Long userId){
-		return offerRepo.findByUserID(userId);
+	public List<Offer> listUserOffers(Users users){
+		return offerRepo.findByUser(users);
 	}
 	
 	public void save(Offer offer) {

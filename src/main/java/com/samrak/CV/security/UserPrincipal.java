@@ -12,17 +12,24 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.samrak.CV.entities.Role;
 import com.samrak.CV.entities.Users;
 
+
 public class UserPrincipal implements UserDetails {
 
-
-	private Users user;
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6353442721667898479L;
+	
+	private Users users;
 	
 	public UserPrincipal(Users users) {
 		super();
-		this.user = users;
+		this.users = users;
 	}
 //
 //	@Override
@@ -34,7 +41,7 @@ public class UserPrincipal implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 			    
-		Collection<Role> roles=user.getRoles();
+		Collection<Role> roles=users.getRoles();
 		
 		List<GrantedAuthority> authorities= new ArrayList<>();
 			    
@@ -56,13 +63,13 @@ public class UserPrincipal implements UserDetails {
 	@Override
 	public String getPassword() {
 		// TODO Auto-generated method stub
-		return user.getUserpassword();
+		return users.getUserpassword();
 	}
 
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return user.getUsername();
+		return users.getUsername();
 	}
 
 	@Override

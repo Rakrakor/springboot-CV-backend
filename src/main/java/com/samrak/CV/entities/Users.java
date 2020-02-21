@@ -15,8 +15,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.validation.constraints.Email;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 
@@ -30,6 +32,7 @@ public class Users {
 	private Long id;
 	
 	@Column(name="user_name")
+	//@JsonProperty("data")   //https://stackoverflow.com/questions/19389723/can-not-deserialize-instance-of-java-lang-string-out-of-start-object-token
 //	@NotEmpty(message="the email section is mandatory")
 //	@Email(message="Email not valid")
 	private String username;
@@ -39,6 +42,7 @@ public class Users {
 	private String userpassword;
 	
 	@Column(name = "user_email")
+	@Email(message="Email not valid")
 	private String email;
 
 
@@ -59,7 +63,7 @@ public class Users {
 	//mmappedBy must have the same name as the @JoinColumn private variable returned in Offer
 	//@JsonBackReference //https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
 	@JsonIgnore
-	@OneToMany(mappedBy="userSpecificOffers")
+	@OneToMany(mappedBy="userPersonalOffers")
 	private List<Offer>offer;
 	
 	

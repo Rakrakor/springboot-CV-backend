@@ -12,12 +12,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
 import com.samrak.CV.entities.Offer;
+import com.samrak.CV.entities.Users;
 
 @Repository
 public interface OfferRepository extends JpaRepository<Offer, Long>{
 
 	void save(Optional<Offer> offer);
 	
-	@Query(value="SELECT * FROM Offer WHERE user_id = :id", nativeQuery = true)
-	List<Offer> findByUserID(@Param("id") Long id);
+	
+	@Query(value="SELECT * FROM Offer WHERE user_id = :user", nativeQuery = true)
+	List<Offer> findByUser(@Param("user") Users user);
+
 }

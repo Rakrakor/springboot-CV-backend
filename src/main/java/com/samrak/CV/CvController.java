@@ -3,10 +3,7 @@ package com.samrak.CV;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +12,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,24 +27,29 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.samrak.CV.entities.AuthenticationResponse;
+import com.samrak.CV.entities.DTOOffers;
+import com.samrak.CV.entities.DTOUsers;
 import com.samrak.CV.entities.File;
 import com.samrak.CV.entities.Me;
 import com.samrak.CV.entities.Offer;
 import com.samrak.CV.entities.Response;
-import com.samrak.CV.entities.Role;
 import com.samrak.CV.entities.Skills;
 import com.samrak.CV.entities.UploadFileResponse;
 import com.samrak.CV.entities.Users;
 import com.samrak.CV.exceptions.FilePathException;
+import com.samrak.CV.security.JwtUtil;
 import com.samrak.CV.service.ServiceFile;
 import com.samrak.CV.service.ServiceMe;
-import com.samrak.CV.service.ServiceNewUserRegistration;
 import com.samrak.CV.service.ServiceOffer;
+import com.samrak.CV.service.ServiceResponse;
 import com.samrak.CV.service.ServiceRole;
 //import com.samrak.CV.service.ServiceRecruiter;
 //import com.samrak.CV.service.ServiceResponse;
@@ -68,9 +71,9 @@ public class CvController {
 	
 	@Autowired
 	private ServiceOffer serveOffer;
-//	
-//	@Autowired
-//	private ServiceResponse serveResp;
+		
+	@Autowired
+	private ServiceResponse serveResp;
 	
 	@Autowired
 	private UserDetailsServices userDetailsServices;
@@ -82,51 +85,143 @@ public class CvController {
 	private ServiceRole serveRole;
 	
 	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private JwtUtil jwtTokenUtil;
 	
 	
-
-
+	
+	
 	
 	@CrossOrigin(origins = "http://localhost:3000") 
-	@PostMapping("/signin")
-	public String signin(@RequestBody Users user) {
+	@RequestMapping("/skills")
+	public List skills(Model model) {
+		List<Skills>skillsList= serveSkills.listAll();
+		return skillsList;
+	}
+	
+	@CrossOrigin(origins = "http://localhost:3000") 
+	@GetMapping("/downloadCV/{fileId}")
+    public ResponseEntity<Resource> downloadCV(@PathVariable Long fileId) throws FileNotFoundException {
+        // Load file from database
+        File dbFile = serveFile.getFile(fileId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(dbFile.getFileType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + dbFile.getFileName() + "\"")
+                .body(new ByteArrayResource(dbFile.getData()));
+    }
+/*
+ * Register - Login
+ */
+	
+	@CrossOrigin(origins = "http://localhost:3000") 
+	@PostMapping("/register")
+//	public String register(@RequestBody Users user) {
+	@JsonProperty("data")
+	public String register(@RequestBody Users user) {
 		
 		
 		//TODO: improvement to delete any other role other than "USER"
 	
-		Optional<Role> roleUser=serveRole.get(2L);
-		Set<Role>userRole=new HashSet<Role>();
-		userRole.add(roleUser.get());
-		user.setRoles(userRole);
 
 		userDetailsServices.registerUser(user);
 		
-		return "redirect:/login";
+		return "redirect:/authenticate";
 	}
 	
 	@CrossOrigin(origins = "http://localhost:3000")
-	@RequestMapping(value = {"/","/login","/register","/forgot"})
-    public String index() {
-        return "index";
+	@RequestMapping(value = "/authenticate",method=RequestMethod.POST)
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody Users users) throws Exception{
+		
+		try {
+		authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(users.getUsername(), users.getUserpassword())
+				);
+		}catch(BadCredentialsException e) {
+			 throw new Exception("Incorrect username or password", e);
+		}
+		final UserDetails userDetails = userDetailsServices.loadUserByUsername(users.getUsername());
+		final String jwt=jwtTokenUtil.generateToken(userDetails);
+		
+		return ResponseEntity.ok(new AuthenticationResponse(jwt));
+		
+		
 	}
+	
+	
+	
 /*
+ * Recruiter: submit New Offer - List recruiter specific offer - Modify specific offer - Delete a specific offer
+ */
 	@CrossOrigin(origins = "http://localhost:3000") 
-	@PostMapping("/login")
-	public Users login(@RequestBody Users user) {
+	@PostMapping("/recruiter/saveNewOffer")
+	public String newOffer(@RequestBody Offer offer) {
+	//public String newOffer(@ModelAttribute("offer") Offer offer) {
 		
+		offer.setMe(serveMe.get(1L).get());
 		
-		//TODO: improvement to delete any other role other than "USER"
-	
-		String usernameReact=user.getUsername();
-		Users foundUser=userDetailsServices.findByUsername(usernameReact);
+		Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+		offer.setUsers(userDetailsServices.findByUsername(auth.getName()));
 		
+		serveOffer.save(offer);
 		
-		return foundUser;
+		return "redirect:/offers";
 	}
-*/
+
+	@CrossOrigin(origins = "http://localhost:3000") 
+	@RequestMapping("/recruiter/submittedOffers")
+	public List userOfferList() {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		List<Offer>userOfferList= serveOffer.listUserOffers(userDetailsServices.findByUsername(auth.getName()));
+		
+		
+		return userOfferList;
+	
+	}
 	
 	
+	@CrossOrigin(origins = "http://localhost:3000") 
+	@PutMapping("/recruiter/update/{id}")
+	public String editOffer(@PathVariable(name="id") Long id,@RequestBody Offer offer ) {
+		
+
+		//on ne peux pas caster Optional vers une entity comme Offer directement
+		//il faut refaire un get d'abord
+		Offer offerInDB=serveOffer.get(id).get();
+		if(offerInDB!=null) {	
+			serveOffer.save(offer);
+		}
+		
+		return "redirect:/offers";
+		
+		
+		//ModelAndView:  https://stackoverflow.com/questions/18486660/what-are-the-differences-between-model-modelmap-and-modelandview
+	}
 	
+	
+	@CrossOrigin(origins = "http://localhost:3000") 
+	@DeleteMapping(value="/recruiter/delete/{id}")  /* Works with axios.delete(id)*/
+	public String deleteProduct(@PathVariable(name="id") Long id) {
+		
+		Offer offerInDB=serveOffer.get(id).get();
+		if(offerInDB!=null) {
+		serveOffer.delete(id);
+		}
+		return "redirect:/offers";
+	}
+	
+
+/*
+ * ADMIN: GET Full Profil -
+ */
+	
+	/*TODO: SKILLS : add code to add - edit - delete skills*/	
+
 	
 	//avec l'annotation @RestController en tete de classe
 	@GetMapping("admin/profil")
@@ -139,128 +234,81 @@ public class CvController {
 	
 	//Me
 	//https://stackoverflow.com/questions/49049312/cors-error-when-connecting-local-react-frontend-to-local-spring-boot-middleware	
-	@CrossOrigin(origins = "http://localhost:3000") /*SECURITY: Cross-Origin Resource Sharing (CORS). Allows REACT.JS on port 3000 to consumes REST service*/  
-	@RequestMapping("/admin")
-	public List homePage(Model model) {
-		
-		List<Me> me = serveMe.listAll();
-		model.addAttribute("me",me);
-		//return "index";
-		return me;
-		
-	}
+	/*SECURITY: Cross-Origin Resource Sharing (CORS). Allows REACT.JS on port 3000 to consumes REST service*/  
+	
 	
 	@CrossOrigin(origins = "http://localhost:3000") 
 	@RequestMapping("/admin/offers")
-	public List jobOffer(Model model) {
+	public List AllJobOffer() {
 
-
-		List<Offer>offersList= serveOffer.listAll();
-		model.addAttribute("offersList",offersList);
-		//return "skills";
-		return offersList;
-	}
+		List <DTOOffers>adminOfferDTOList= new ArrayList<>();
+		
+		List<Offer>adminOfferList= serveOffer.listAll();
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
-	@RequestMapping("/admin/respondToOffer/{id}")
-	public void respondToOffer(@PathVariable(name="id") Long id,@RequestBody Offer offer, @RequestBody Response response){
-		
-		Offer offerInDB=serveOffer.get(id).get();
-		
-		List<Response> responseList=new ArrayList<Response>();
-		
-		if(offerInDB.getResponse()!=null) {
-		responseList.addAll(offerInDB.getResponse());
-		}
-		responseList.add(response);
-		
-		offerInDB.setResponse(responseList);
-		
-		
-	}
-
-	/*TODO: SKILLS : add code to add - edit - delete skills*/	
-
-	@CrossOrigin(origins = "http://localhost:3000") 
-	@RequestMapping("/skills")
-	public List skills(Model model) {
-		List<Skills>skillsList= serveSkills.listAll();
-		model.addAttribute("skillsList",skillsList);
-		//return "skills";
-		return skillsList;
-	}
-	
-
-	
-	
-	
-	@CrossOrigin(origins = "http://localhost:3000") 
-	@RequestMapping("/user/submittedOffers")
-	public List userOfferList(Model model) {
-
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
-		List<Offer>userOfferList= serveOffer.listUserOffers(userDetailsServices.userCurrentID(auth.getName()));
-		//model.addAttribute("userOfferList",userOfferList);
-		
-		return userOfferList;
-	}
-	
-	@CrossOrigin(origins = "http://localhost:3000") 
-	@RequestMapping("/showNewOfferForm")
-	public void makeNewOffer(Model model) {
-		Offer offer = new Offer();
-		model.addAttribute("offer",offer);
-		
-		//on retourne une page Thymeleaf ou autre desiree pour editer le contenu de l'offre
-		//return "new_offer";
-		
-		
-	}
-	
-	@CrossOrigin(origins = "http://localhost:3000") 
-	@PostMapping("/user/saveNewOffer")
-	public String newOffer(@RequestBody Offer offer) {
-	//public String newOffer(@ModelAttribute("offer") Offer offer) {
-		
-		offer.setMe(serveMe.get(1L).get());
-		serveOffer.save(offer);
-		
-		return "redirect:/offers";
-	}
-	
-	@CrossOrigin(origins = "http://localhost:3000") 
-	@PutMapping("/user/update/{id}")
-	public String editOffer(@PathVariable(name="id") Long id,@RequestBody Offer offer ) {
-		
-		//la page edit_offer doit s'afficher dans la vue
-		//ModelAndView mav=new ModelAndView("edit_offer");
-		
-		
-		//on ne peux pas caster Optional vers une entity comme Offer directement
-		//il faut refaire un get d'abord
-		Offer offerInDB=serveOffer.get(id).get();
-		if(offerInDB!=null) {
-		
-			//mav.addObject("offer",offer);
+		for(Offer offer:adminOfferList) {
+			DTOUsers userDTO=new DTOUsers();
+			userDTO.setId(offer.getuserPersonalOffers().getId());
+			userDTO.setEmail(offer.getuserPersonalOffers().getEmail());
+			userDTO.setUsername(offer.getuserPersonalOffers().getUsername());
+			userDTO.setUsercompany(offer.getuserPersonalOffers().getUsercompany());
+			userDTO.setPhonenumber(offer.getuserPersonalOffers().getPhonenumber() );
+			userDTO.setStatus(offer.getuserPersonalOffers().getStatus());
 			
-			serveOffer.save(offer);
+			DTOOffers offerDTO=new DTOOffers();
+			
+			offerDTO.setId(offer.getId());
+			offerDTO.setTitle(offer.getTitle());
+			offerDTO.setDescription(offer.getDescription());
+			offerDTO.setContractType(offer.getContractType());
+			offerDTO.setStartDate(offer.getStartDate());
+			offerDTO.setWages(offer.getWages());
+			offerDTO.setUserPersonalOffers(userDTO);
+			offerDTO.setResponse(offer.getResponse());
+			
+			adminOfferDTOList.add(offerDTO);
 		}
 		
-		return "redirect:/offers";
-		//return mav;
-		
-		//ModelAndView:  https://stackoverflow.com/questions/18486660/what-are-the-differences-between-model-modelmap-and-modelandview
+		return adminOfferDTOList;
 	}
 	
+	//TODO: Implement Response correctly
+	@CrossOrigin(origins = "http://localhost:3000") 
+	@PostMapping("/offer/addacomment/{id}")
+	public String respondToOffer(@PathVariable(name="id") Long id,@RequestBody String answer){
+		
+		Offer offerInDB=serveOffer.get(id).get();
+		if(offerInDB!=null) {	
+			
+			Response aResp=new Response();
+			aResp.setOffer(offerInDB);
+			aResp.setAnswer(answer);
+			serveResp.save(aResp);
+		}
+		
+	return "redirect:/offers";
+			
+	}
 	
 	@CrossOrigin(origins = "http://localhost:3000") 
-	@DeleteMapping(value="/user/delete/{id}")  /* Works with axios.delete(id)*/
-	public String deleteProduct(@PathVariable(name="id") Long id) {
+	@GetMapping("offer/viewconversation/{id}")
+	public List respondResponses(@PathVariable(name="id") Long id){
 		
-		serveOffer.delete(id);
-		return "redirect:/offers";
+		Offer offerInDB=serveOffer.get(id).get();
+		List <Response> listResponses=new ArrayList<>();
+		if(offerInDB!=null) {	
+			
+			listResponses=serveResp.findResponseByOffer(id);
+		}
+	return listResponses;
+			
 	}
+
+
+	
+
+	
+	
+	
 	
 	
 	/****************************************************************

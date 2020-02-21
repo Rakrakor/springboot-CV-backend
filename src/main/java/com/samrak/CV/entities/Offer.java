@@ -47,12 +47,12 @@ public class Offer {
 	private Me me;
 	
 	//@JsonManagedReference //https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
-	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
+	//@JsonIgnore
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="user_id")
-	private Users userSpecificOffers;
+	private Users userPersonalOffers;
 	
-	@OneToMany(mappedBy="response")
+	@OneToMany(mappedBy="answer")
 	private List<Response>response;
 	
 	
@@ -148,14 +148,14 @@ public class Offer {
 
 
 
-	public Users getUserSpecificOffers() {
-		return userSpecificOffers;
+	public Users getuserPersonalOffers() {
+		return userPersonalOffers;
 	}
 
 
 
-	public void setUserSpecificOffers(Users userSpecificOffers) {
-		this.userSpecificOffers = userSpecificOffers;
+	public void setUsers(Users userPersonalOffers) {
+		this.userPersonalOffers = userPersonalOffers;
 	}
 
 

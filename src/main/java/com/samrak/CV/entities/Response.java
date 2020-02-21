@@ -20,7 +20,7 @@ public class Response {
 	private Long id;
 	
 	@Column(name="response")
-	private String response;
+	private String answer;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -50,14 +50,14 @@ public class Response {
 
 
 
-	public String getResponse() {
-		return response;
+	public String getAnswer() {
+		return answer;
 	}
 
 
 
-	public void setResponse(String response) {
-		this.response = response;
+	public void setAnswer(String answer) {
+		this.answer = answer;
 	}
 
 
@@ -71,9 +71,6 @@ public class Response {
 	public void setOffer(Offer offer) {
 		this.offer = offer;
 	}
-
-	
-	
 	
 	
 

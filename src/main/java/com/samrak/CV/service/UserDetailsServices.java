@@ -1,15 +1,17 @@
 package com.samrak.CV.service;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.samrak.CV.entities.Role;
 import com.samrak.CV.entities.Users;
 import com.samrak.CV.repository.UserRepository;
 import com.samrak.CV.security.UserPrincipal;
@@ -23,6 +25,9 @@ public class UserDetailsServices implements UserDetailsService{
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	@Autowired
+	private ServiceRole serveRole;
+	
 	
 	
 	@Override
@@ -33,6 +38,7 @@ public class UserDetailsServices implements UserDetailsService{
 			throw new UsernameNotFoundException("User 404");
 		
 		return new UserPrincipal(user);
+		
 	}
 	
 	
@@ -45,17 +51,22 @@ public class UserDetailsServices implements UserDetailsService{
 	
 	public void registerUser(Users user) {
 		
-//		Users checkExistingUser=userRepo.findByUsername(user.getUsername());
+		Users checkExistingUser=userRepo.findByUsername(user.getUsername());
 //		if(checkExistingUser!=null) {
 //			//do sthing
 //		}
 		
 		
-		//if(checkExistingUser==null) {
+		if(checkExistingUser==null) {
+			
+			Optional<Role> roleUser=serveRole.get(2L);
+			Set<Role>userRole=new HashSet<Role>();
+			userRole.add(roleUser.get());
+			user.setRoles(userRole);
 			
 			user.setUserpassword(passwordEncoder.encode(user.getUserpassword()));
 			userRepo.save(user);
-		//}
+		}
 		
 	}
 	
