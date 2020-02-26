@@ -41,7 +41,7 @@ public class Offer {
 	private int wages;
 	
 	//https://stackoverflow.com/questions/11938253/whats-the-difference-between-joincolumn-and-mappedby-when-using-a-jpa-onetoma
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "me_id")
 	@JsonIgnore
 	private Me me;

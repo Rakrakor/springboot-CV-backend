@@ -19,8 +19,17 @@ public interface OfferRepository extends JpaRepository<Offer, Long>{
 
 	void save(Optional<Offer> offer);
 	
+	@Query(value="SELECT * FROM offer WHERE id=:id", nativeQuery = true)
+	Optional<Offer> findById(@Param("id") Long id);
 	
-	@Query(value="SELECT * FROM Offer WHERE user_id = :user", nativeQuery = true)
+	
+	@Query(value="SELECT * FROM offer WHERE user_id = :user", nativeQuery = true)
 	List<Offer> findByUser(@Param("user") Users user);
+	
+	@Query(value="SELECT * FROM offer", nativeQuery = true)
+	List<Offer> retrieveAll();
+
+
+	
 
 }

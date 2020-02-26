@@ -48,7 +48,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		//Traduction: authorise tous pour /authenticate.
 		//toute autre request doit etre authenticate ( anyRequest)
 		//Stateless: we use the jwt to manage session instead
-		http.csrf().disable().authorizeRequests()
+		http
+		.cors()
+		.and()
+			.csrf().disable()
+			.authorizeRequests()
 			.antMatchers("/authenticate").permitAll()
 			.antMatchers("/register").permitAll()
 			.antMatchers("/skills").permitAll()
@@ -57,7 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers("/recruiter/**").hasAnyAuthority("USER","ADMIN")
 			.antMatchers("/offer/**").hasAnyAuthority("USER","ADMIN")
 			.anyRequest().authenticated()
-			.and()
+		.and()
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

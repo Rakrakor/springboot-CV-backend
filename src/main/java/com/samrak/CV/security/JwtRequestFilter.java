@@ -36,9 +36,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		
 		final String authorizationHeader=request.getHeader("Authorization");
 		
-		/*TEST set Token in Header:  https://stackoverflow.com/questions/53605255/spring-boot-jwt-cors-with-angular-6*/
-		
-		/*TEST*/
 		
 		String username=null;
 		String jwt=null;

@@ -21,6 +21,11 @@ public class ServiceOffer {
 		return offerRepo.findAll();
 	}
 	
+	public List<Offer> retrieveAll(){
+		return offerRepo.retrieveAll();
+	}
+	
+	
 	public List<Offer> listUserOffers(Users users){
 		return offerRepo.findByUser(users);
 	}
@@ -29,8 +34,8 @@ public class ServiceOffer {
 		offerRepo.save(offer);
 	}
 	
+	
 	public Optional<Offer> get(Long id) {
-		
 		return offerRepo.findById(id);
 	}
 	

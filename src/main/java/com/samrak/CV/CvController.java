@@ -1,9 +1,11 @@
 package com.samrak.CV;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,14 +97,16 @@ public class CvController {
 	
 	
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000") 
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@RequestMapping("/skills")
 	public List skills(Model model) {
 		List<Skills>skillsList= serveSkills.listAll();
 		return skillsList;
 	}
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@GetMapping("/downloadCV/{fileId}")
     public ResponseEntity<Resource> downloadCV(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database
@@ -117,7 +121,8 @@ public class CvController {
  * Register - Login
  */
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@PostMapping("/register")
 //	public String register(@RequestBody Users user) {
 	@JsonProperty("data")
@@ -132,7 +137,22 @@ public class CvController {
 		return "redirect:/authenticate";
 	}
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
+	@GetMapping("/usercredentials")
+//	public String register(@RequestBody Users user) {
+	@JsonProperty("data")
+	public List credentials() {
+		
+		
+		Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+		return auth.getAuthorities().stream().collect(Collectors.toList());
+		
+	}
+	
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@RequestMapping(value = "/authenticate",method=RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody Users users) throws Exception{
 		
@@ -156,22 +176,23 @@ public class CvController {
 /*
  * Recruiter: submit New Offer - List recruiter specific offer - Modify specific offer - Delete a specific offer
  */
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@PostMapping("/recruiter/saveNewOffer")
-	public String newOffer(@RequestBody Offer offer) {
+	public String newOffer(@RequestBody Offer offer) throws IOException {
 	//public String newOffer(@ModelAttribute("offer") Offer offer) {
 		
 		offer.setMe(serveMe.get(1L).get());
 		
 		Authentication auth= SecurityContextHolder.getContext().getAuthentication();
 		offer.setUsers(userDetailsServices.findByUsername(auth.getName()));
-		
 		serveOffer.save(offer);
+		return "redirect:/recruiter/submittedOffers";
 		
-		return "redirect:/offers";
 	}
 
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@RequestMapping("/recruiter/submittedOffers")
 	public List userOfferList() {
 
@@ -179,32 +200,101 @@ public class CvController {
 		
 		List<Offer>userOfferList= serveOffer.listUserOffers(userDetailsServices.findByUsername(auth.getName()));
 		
+		List <DTOOffers>userOfferDTOList= new ArrayList<>();
 		
-		return userOfferList;
+		for(Offer offer:userOfferList) {
+			DTOUsers userDTO=new DTOUsers();
+			userDTO.setId(offer.getuserPersonalOffers().getId());
+			userDTO.setEmail(offer.getuserPersonalOffers().getEmail());
+			userDTO.setUsername(offer.getuserPersonalOffers().getUsername());
+			userDTO.setUsercompany(offer.getuserPersonalOffers().getUsercompany());
+			userDTO.setPhonenumber(offer.getuserPersonalOffers().getPhonenumber() );
+			userDTO.setStatus(offer.getuserPersonalOffers().getStatus());
+			
+			DTOOffers offerDTO=new DTOOffers();
+			
+			offerDTO.setId(offer.getId());
+			offerDTO.setTitle(offer.getTitle());
+			offerDTO.setDescription(offer.getDescription());
+			offerDTO.setContractType(offer.getContractType());
+			offerDTO.setStartDate(offer.getStartDate());
+			offerDTO.setWages(offer.getWages());
+			//offerDTO.setUserPersonalOffers(userDTO);
+			offerDTO.setResponse(offer.getResponse());
+			
+			userOfferDTOList.add(offerDTO);
+		}
+		
+		return userOfferDTOList;
 	
 	}
 	
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
+	@GetMapping("/recruiter/findOffer/{id}")
+	public DTOOffers findOffer(@PathVariable(name="id") Long id ) {
+		
+		
+		//on ne peux pas caster Optional vers une entity comme Offer directement
+		//il faut refaire un get d'abord
+		Offer offerInDB=serveOffer.get(id).get();
+		if(offerInDB!=null) {
+			DTOUsers userDTO=new DTOUsers();
+			userDTO.setId(offerInDB.getuserPersonalOffers().getId());
+			userDTO.setEmail(offerInDB.getuserPersonalOffers().getEmail());
+			userDTO.setUsername(offerInDB.getuserPersonalOffers().getUsername());
+			userDTO.setUsercompany(offerInDB.getuserPersonalOffers().getUsercompany());
+			userDTO.setPhonenumber(offerInDB.getuserPersonalOffers().getPhonenumber() );
+			userDTO.setStatus(offerInDB.getuserPersonalOffers().getStatus());
+			
+			DTOOffers offerDTO=new DTOOffers();
+			
+			offerDTO.setId(offerInDB.getId());
+			offerDTO.setTitle(offerInDB.getTitle());
+			offerDTO.setDescription(offerInDB.getDescription());
+			offerDTO.setContractType(offerInDB.getContractType());
+			offerDTO.setStartDate(offerInDB.getStartDate());
+			offerDTO.setWages(offerInDB.getWages());
+			//offerDTO.setUserPersonalOffers(userDTO);
+			offerDTO.setResponse(offerInDB.getResponse());
+			
+			
+			return offerDTO;
+		}else {
+			return null;
+		}
+	}
+		
+		
+	
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@PutMapping("/recruiter/update/{id}")
 	public String editOffer(@PathVariable(name="id") Long id,@RequestBody Offer offer ) {
 		
-
+		offer.setMe(serveMe.get(1L).get());
+		Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+		offer.setUsers(userDetailsServices.findByUsername(auth.getName()));
+		
+		
 		//on ne peux pas caster Optional vers une entity comme Offer directement
 		//il faut refaire un get d'abord
 		Offer offerInDB=serveOffer.get(id).get();
 		if(offerInDB!=null) {	
+			offer.setId(id);
 			serveOffer.save(offer);
 		}
 		
-		return "redirect:/offers";
+		return "redirect:/recruiter/submittedOffers";
 		
 		
 		//ModelAndView:  https://stackoverflow.com/questions/18486660/what-are-the-differences-between-model-modelmap-and-modelandview
 	}
 	
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@DeleteMapping(value="/recruiter/delete/{id}")  /* Works with axios.delete(id)*/
 	public String deleteProduct(@PathVariable(name="id") Long id) {
 		
@@ -212,7 +302,7 @@ public class CvController {
 		if(offerInDB!=null) {
 		serveOffer.delete(id);
 		}
-		return "redirect:/offers";
+		return "redirect:/recruiter/submittedOffers";
 	}
 	
 
@@ -224,6 +314,7 @@ public class CvController {
 
 	
 	//avec l'annotation @RestController en tete de classe
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@GetMapping("admin/profil")
 	public Me getMe(){
 		
@@ -237,14 +328,20 @@ public class CvController {
 	/*SECURITY: Cross-Origin Resource Sharing (CORS). Allows REACT.JS on port 3000 to consumes REST service*/  
 	
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@RequestMapping("/admin/offers")
 	public List AllJobOffer() {
 
 		List <DTOOffers>adminOfferDTOList= new ArrayList<>();
 		
-		List<Offer>adminOfferList= serveOffer.listAll();
+		//Solution if no null pointer in table offer:
+		//Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+		//List<Offer>adminOfferList= serveOffer.listUserOffers(userDetailsServices.findByUsername(auth.getName()));
 	
+		//wiht possibilities of nullpointer:
+		List<Offer> adminOfferList=serveOffer.retrieveAll();
+		
 		for(Offer offer:adminOfferList) {
 			DTOUsers userDTO=new DTOUsers();
 			userDTO.setId(offer.getuserPersonalOffers().getId());
@@ -272,7 +369,8 @@ public class CvController {
 	}
 	
 	//TODO: Implement Response correctly
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@PostMapping("/offer/addacomment/{id}")
 	public String respondToOffer(@PathVariable(name="id") Long id,@RequestBody String answer){
 		
@@ -289,7 +387,8 @@ public class CvController {
 			
 	}
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@GetMapping("offer/viewconversation/{id}")
 	public List respondResponses(@PathVariable(name="id") Long id){
 		
@@ -321,7 +420,8 @@ public class CvController {
 	
 	//@PostMapping("uploadFile") <=> @RequestMapping(value="/uploadFile", method=RequestMethod.POST)
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@PostMapping("/user/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) throws FilePathException {
       
@@ -338,7 +438,8 @@ public class CvController {
     }
 
 	
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@PostMapping("/user/uploadMultipleFiles")
     public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
         return Arrays.asList(files)
@@ -356,7 +457,8 @@ public class CvController {
     }
 
     
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@GetMapping("/user/downloadFile/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database
@@ -369,7 +471,8 @@ public class CvController {
     }
     
     
-	@CrossOrigin(origins = "http://localhost:3000") 
+	//@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "https://www.samrak.info")
 	@GetMapping("/user/deleteFile/{fileId}")
     public boolean deleteFile(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database

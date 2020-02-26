@@ -17,7 +17,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class JwtUtil {
 
-	private String SECRET_KEY="secret";
+	private String SECRET_KEY="1Techtrip!";
 	
 	//used to pull info from token : extractUsername / extractExpiration
 	public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
