@@ -134,7 +134,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     CorsConfigurationSource corsConfigurationSource()
     {
 		 	CorsConfiguration configuration = new CorsConfiguration();
-	        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+	        configuration.setAllowedOrigins(Arrays.asList("https://guarded-castle-37898.herokuapp.com"));
 	        configuration.setAllowedHeaders(Arrays.asList("*"));
 	        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
 	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
