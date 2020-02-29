@@ -101,7 +101,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000") 
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@RequestMapping("/skills")
 	public List skills(Model model) {
 		List<Skills>skillsList= serveSkills.listAll();
@@ -111,7 +111,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@GetMapping("/downloadCV/{fileId}")
     public ResponseEntity<Resource> downloadCV(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database
@@ -129,7 +129,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@PostMapping("/register")
 //	public String register(@RequestBody Users user) {
 	@JsonProperty("data")
@@ -148,7 +148,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@GetMapping("/usercredentials")
 //	public String register(@RequestBody Users user) {
 	@JsonProperty("data")
@@ -163,7 +163,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@RequestMapping(value = "/authenticate",method=RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody Users users) throws Exception{
 		
@@ -190,7 +190,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@PostMapping("/recruiter/saveNewOffer")
 	public String newOffer(@RequestBody Offer offer) throws IOException {
 	//public String newOffer(@ModelAttribute("offer") Offer offer) {
@@ -207,7 +207,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@RequestMapping("/recruiter/submittedOffers")
 	public List userOfferList() {
 
@@ -248,7 +248,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@GetMapping("/recruiter/findOffer/{id}")
 	public DTOOffers findOffer(@PathVariable(name="id") Long id ) {
 		
@@ -288,7 +288,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@PutMapping("/recruiter/update/{id}")
 	public String editOffer(@PathVariable(name="id") Long id,@RequestBody Offer offer ) {
 		
@@ -315,7 +315,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@DeleteMapping(value="/recruiter/delete/{id}")  /* Works with axios.delete(id)*/
 	public String deleteProduct(@PathVariable(name="id") Long id) {
 		
@@ -337,7 +337,7 @@ public class CvController {
 	//avec l'annotation @RestController en tete de classe
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@GetMapping("admin/profil")
 	public Me getMe(){
 		
@@ -354,7 +354,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@RequestMapping("/admin/offers")
 	public List AllJobOffer() {
 
@@ -397,7 +397,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@PostMapping("/offer/addacomment/{id}")
 	public String respondToOffer(@PathVariable(name="id") Long id,@RequestBody String answer){
 		
@@ -417,7 +417,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@GetMapping("offer/viewconversation/{id}")
 	public List respondResponses(@PathVariable(name="id") Long id){
 		
@@ -452,7 +452,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@PostMapping("/user/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) throws FilePathException {
       
@@ -472,7 +472,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@PostMapping("/user/uploadMultipleFiles")
     public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
         return Arrays.asList(files)
@@ -493,7 +493,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@GetMapping("/user/downloadFile/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database
@@ -509,7 +509,7 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
 	@GetMapping("/user/deleteFile/{fileId}")
     public boolean deleteFile(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database
