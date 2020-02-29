@@ -163,8 +163,8 @@ public class CvController {
 	//@CrossOrigin(origins = "http://localhost:3000")
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com/")
-	@RequestMapping(value = "/authenticate",method=RequestMethod.POST)
+	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@RequestMapping(value = "/authenticate",method= {RequestMethod.POST,RequestMethod.GET})
     public ResponseEntity<?> createAuthenticationToken(@RequestBody Users users) throws Exception{
 		
 		try {
