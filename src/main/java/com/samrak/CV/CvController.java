@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -164,6 +165,7 @@ public class CvController {
 	//@CrossOrigin(origins = "https://www.samrak.info")
 	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
 	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@ResponseBody
 	@RequestMapping(value = "/authenticate",method= {RequestMethod.POST,RequestMethod.GET})
     public ResponseEntity<?> createAuthenticationToken(@RequestBody Users users) throws Exception{
 		
