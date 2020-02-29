@@ -60,6 +60,7 @@ import com.samrak.CV.service.UserDetailsServices;
 
 //@Controller
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CvController {
 	
 	@Autowired
