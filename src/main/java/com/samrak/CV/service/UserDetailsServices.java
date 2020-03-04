@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -67,6 +69,33 @@ public class UserDetailsServices implements UserDetailsService{
 			user.setUserpassword(passwordEncoder.encode(user.getUserpassword()));
 			userRepo.save(user);
 		}
+		
+	}
+	
+	public void updateUser(Users user) {
+		
+		Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+		Users findExistingUser = this.findByUsername(auth.getName());
+		
+			if(findExistingUser!=null) {
+				if(user.getUsername()!=null) {
+					findExistingUser.setUsername(user.getUsername());
+				}
+				if(user.getUserpassword()!=null) {
+					findExistingUser.setUserpassword(passwordEncoder.encode(user.getUserpassword()));
+				}
+				if(user.getEmail()!=null) {
+					findExistingUser.setEmail(user.getEmail());
+				}
+				if(user.getPhonenumber()!=null) {
+					findExistingUser.setPhonenumber(user.getPhonenumber());
+				}
+				if(user.getUsercompany()!=null) {
+					findExistingUser.setUsercompany(user.getUsercompany());
+				}
+			
+				userRepo.save(findExistingUser);
+		}	
 		
 	}
 	

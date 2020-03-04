@@ -59,7 +59,7 @@ import com.samrak.CV.service.ServiceRole;
 import com.samrak.CV.service.ServiceSkills;
 import com.samrak.CV.service.UserDetailsServices;
 
-//@Controller
+
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CvController {
@@ -99,20 +99,17 @@ public class CvController {
 	
 	
 	
-	//@CrossOrigin(origins = "http://localhost:3000") 
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	
+	//@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info"})
 	@RequestMapping("/skills")
 	public List skills(Model model) {
 		List<Skills>skillsList= serveSkills.listAll();
 		return skillsList;
 	}
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@GetMapping("/downloadCV/{fileId}")
     public ResponseEntity<Resource> downloadCV(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database
@@ -127,10 +124,7 @@ public class CvController {
  * Register - Login
  */
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@PostMapping("/register")
 //	public String register(@RequestBody Users user) {
 	@JsonProperty("data")
@@ -146,10 +140,7 @@ public class CvController {
 	}
 	
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@GetMapping("/usercredentials")
 //	public String register(@RequestBody Users user) {
 	@JsonProperty("data")
@@ -161,12 +152,9 @@ public class CvController {
 		
 	}
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
-	@ResponseBody
-	@RequestMapping(value = "/authenticate",method= {RequestMethod.POST,RequestMethod.GET})
+	
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
+	@RequestMapping(value = "/authenticate",method= {RequestMethod.POST})
     public ResponseEntity<?> createAuthenticationToken(@RequestBody Users users) throws Exception{
 		
 		try {
@@ -185,14 +173,80 @@ public class CvController {
 	}
 	
 	
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
+	@RequestMapping(value = "/user/profile",method= {RequestMethod.GET})
+    public DTOUsers getCurrentUserProfile() throws Exception{
+		
+		try {
+			Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+			Users currentUser = userDetailsServices.findByUsername(auth.getName());
+			DTOUsers DTOcurrentUser= new DTOUsers();
+			
+			DTOcurrentUser.setId(currentUser.getId());
+			DTOcurrentUser.setEmail(currentUser.getEmail());
+			DTOcurrentUser.setUsername(currentUser.getUsername());
+			DTOcurrentUser.setUsercompany(currentUser.getUsercompany());
+			DTOcurrentUser.setPhonenumber(currentUser.getPhonenumber());
+			DTOcurrentUser.setStatus(currentUser.getStatus());
+			
+			
+			return DTOcurrentUser;
+		
+		
+		}catch(Exception e) {
+			 throw new Exception("Pb loading current user", e);
+		}
+	}
+	
+	
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
+	@PutMapping(value = "/user/update")
+    public ResponseEntity<?> updateCurrentUserProfile(@RequestBody Users user) throws Exception{
+		
+		try {
+			userDetailsServices.updateUser(user);	
+			String jwt=new String();
+			
+			if(user.getUsername()!=null && user.getUserpassword()==null) {
+				//Users updatedUser = userDetailsServices.findByUsername(user.getUsername());
+				UserDetails userDetails = userDetailsServices.loadUserByUsername(user.getUsername());
+				jwt=jwtTokenUtil.generateToken(userDetails);
+			}
+			
+			if(user.getUsername()==null && user.getUserpassword()!=null) {
+				Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+				UserDetails userDetails = userDetailsServices.loadUserByUsername(auth.getName());
+				jwt=jwtTokenUtil.generateToken(userDetails);
+			}
+			
+			if(user.getUsername()!=null && user.getUserpassword()!=null) {
+				//Users updatedUser = userDetailsServices.findByUsername(user.getUsername());
+				UserDetails userDetails = userDetailsServices.loadUserByUsername(user.getUsername());
+				jwt=jwtTokenUtil.generateToken(userDetails);
+			}
+			
+			if(user.getUsername()==null && user.getUserpassword()==null) {
+				Authentication auth= SecurityContextHolder.getContext().getAuthentication();
+				UserDetails userDetails = userDetailsServices.loadUserByUsername(auth.getName());
+				jwt=jwtTokenUtil.generateToken(userDetails);
+			}
+			
+			
+			return ResponseEntity.ok(new AuthenticationResponse(jwt));
+			
+			
+			
+		}catch(Exception e) {
+			 throw new Exception("Pb loading current user", e);
+		}
+	}
+	
+	
 	
 /*
  * Recruiter: submit New Offer - List recruiter specific offer - Modify specific offer - Delete a specific offer
  */
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@PostMapping("/recruiter/saveNewOffer")
 	public String newOffer(@RequestBody Offer offer) throws IOException {
 	//public String newOffer(@ModelAttribute("offer") Offer offer) {
@@ -206,10 +260,8 @@ public class CvController {
 		
 	}
 
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@RequestMapping("/recruiter/submittedOffers")
 	public List userOfferList() {
 
@@ -247,10 +299,8 @@ public class CvController {
 	}
 	
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@GetMapping("/recruiter/findOffer/{id}")
 	public DTOOffers findOffer(@PathVariable(name="id") Long id ) {
 		
@@ -287,10 +337,7 @@ public class CvController {
 		
 		
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@PutMapping("/recruiter/update/{id}")
 	public String editOffer(@PathVariable(name="id") Long id,@RequestBody Offer offer ) {
 		
@@ -314,10 +361,7 @@ public class CvController {
 	}
 	
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@DeleteMapping(value="/recruiter/delete/{id}")  /* Works with axios.delete(id)*/
 	public String deleteProduct(@PathVariable(name="id") Long id) {
 		
@@ -336,10 +380,7 @@ public class CvController {
 	/*TODO: SKILLS : add code to add - edit - delete skills*/	
 
 	
-	//avec l'annotation @RestController en tete de classe
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@GetMapping("admin/profil")
 	public Me getMe(){
 		
@@ -353,10 +394,8 @@ public class CvController {
 	/*SECURITY: Cross-Origin Resource Sharing (CORS). Allows REACT.JS on port 3000 to consumes REST service*/  
 	
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@RequestMapping("/admin/offers")
 	public List AllJobOffer() {
 
@@ -395,11 +434,7 @@ public class CvController {
 		return adminOfferDTOList;
 	}
 	
-	//TODO: Implement Response correctly
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@PostMapping("/offer/addacomment/{id}")
 	public String respondToOffer(@PathVariable(name="id") Long id,@RequestBody String answer){
 		
@@ -415,11 +450,9 @@ public class CvController {
 	return "redirect:/offers";
 			
 	}
+
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@GetMapping("offer/viewconversation/{id}")
 	public List respondResponses(@PathVariable(name="id") Long id){
 		
@@ -451,10 +484,8 @@ public class CvController {
 	
 	//@PostMapping("uploadFile") <=> @RequestMapping(value="/uploadFile", method=RequestMethod.POST)
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@PostMapping("/user/uploadFile")
     public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) throws FilePathException {
       
@@ -471,10 +502,8 @@ public class CvController {
     }
 
 	
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@PostMapping("/user/uploadMultipleFiles")
     public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
         return Arrays.asList(files)
@@ -492,10 +521,8 @@ public class CvController {
     }
 
     
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@GetMapping("/user/downloadFile/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database
@@ -508,10 +535,8 @@ public class CvController {
     }
     
     
-	//@CrossOrigin(origins = "http://localhost:3000")
-	//@CrossOrigin(origins = "https://www.samrak.info")
-	//@CrossOrigin(origins = "cvfronta-env.he6mbc62qv.us-east-2.elasticbeanstalk.com")
-	@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
+
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info","https://guarded-castle-37898.herokuapp.com"})
 	@GetMapping("/user/deleteFile/{fileId}")
     public boolean deleteFile(@PathVariable Long fileId) throws FileNotFoundException {
         // Load file from database
