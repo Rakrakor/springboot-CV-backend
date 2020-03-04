@@ -101,7 +101,7 @@ public class CvController {
 	
 	
 	//@CrossOrigin(origins = "https://guarded-castle-37898.herokuapp.com")
-	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info"})
+	@CrossOrigin(origins = {"http://www.samrak.info", "https://www.samrak.info", "https://guarded-castle-37898.herokuapp.com"})
 	@RequestMapping("/skills")
 	public List skills(Model model) {
 		List<Skills>skillsList= serveSkills.listAll();
