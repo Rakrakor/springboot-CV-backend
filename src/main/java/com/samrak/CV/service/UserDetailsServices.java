@@ -78,19 +78,20 @@ public class UserDetailsServices implements UserDetailsService{
 		Users findExistingUser = this.findByUsername(auth.getName());
 		
 			if(findExistingUser!=null) {
-				if(user.getUsername()!=null) {
+				if(!user.getUsername().isEmpty()) {
 					findExistingUser.setUsername(user.getUsername());
 				}
-				if(user.getUserpassword()!=null) {
-					findExistingUser.setUserpassword(passwordEncoder.encode(user.getUserpassword()));
+				if(!user.getUserpassword().isEmpty()) {
+					user.setUserpassword(passwordEncoder.encode(user.getUserpassword()));
+					findExistingUser.setUserpassword(user.getUserpassword());
 				}
-				if(user.getEmail()!=null) {
+				if(!user.getEmail().isEmpty()) {
 					findExistingUser.setEmail(user.getEmail());
 				}
-				if(user.getPhonenumber()!=null) {
+				if(!user.getPhonenumber().isEmpty()) {
 					findExistingUser.setPhonenumber(user.getPhonenumber());
 				}
-				if(user.getUsercompany()!=null) {
+				if(!user.getUsercompany().isEmpty()) {
 					findExistingUser.setUsercompany(user.getUsercompany());
 				}
 			

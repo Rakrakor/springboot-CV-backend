@@ -134,7 +134,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     CorsConfigurationSource corsConfigurationSource()
     {
 		 	CorsConfiguration configuration = new CorsConfiguration();
-	        configuration.setAllowedOrigins(Arrays.asList("http://www.samrak.info", "https://www.samrak.info", "https://guarded-castle-37898.herokuapp.com"));
+	        configuration.setAllowedOrigins(Arrays.asList("http://www.samrak.info", "https://www.samrak.info", "https://guarded-castle-37898.herokuapp.com","http://localhost:3000"));
 		 	configuration.setAllowedHeaders(Arrays.asList("*"));
 	        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
 	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
